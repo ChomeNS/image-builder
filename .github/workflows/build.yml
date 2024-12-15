@@ -4,9 +4,10 @@ on:
   schedule:
     - cron: '0 */6 * * *' # Every 6 hours
   workflow_dispatch:
+  push:
 
 jobs:
-  build-vmdk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +22,8 @@ jobs:
     - name: Install packages
       run: |
         sudo apt update
-        sudo apt install -y qemu-utils cloud-image-utils
+        sudo apt purge -y man-db
+        sudo apt install -y qemu-system qemu-system-x86 qemu-utils cloud-image-utils
 
     - name: Create Build Directory
       run: mkdir -p build
