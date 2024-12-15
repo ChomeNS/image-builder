@@ -66,6 +66,8 @@ jobs:
 
     - name: Build VMDK Image
       run: |
+        packer plugins install github.com/hashicorp/qemu
+        packer plugins install github.com/hashicorp/vmware
         packer init build/ubuntu-kde.pkr.hcl
         packer build build/ubuntu-kde.pkr.hcl
 
