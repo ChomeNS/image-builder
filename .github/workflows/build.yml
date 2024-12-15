@@ -39,6 +39,8 @@ jobs:
           disk_size      = "20000" # 20GB
           memory         = 2048
           cpus           = 2
+          accelerator    = "kvm"
+          format         = "vmdk"
           ssh_username   = "ubuntu"
           ssh_password   = "changeMe"
           shutdown_command = "echo changeMe | sudo -S shutdown -P now"
@@ -56,10 +58,6 @@ jobs:
               "echo ubuntu:changeMe | sudo chpasswd",
               "sudo chage -d 0 ubuntu" # Force password change after first login
             ]
-          }
-
-          post-processor "vmware-vdiskmanager" {
-            output = var.output_directory
           }
         }
         EOF
