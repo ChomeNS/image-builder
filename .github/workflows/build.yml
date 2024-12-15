@@ -1,0 +1,76 @@
+name: Build Ubuntu KDE VMDK Image
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  build-vmdk:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up HashiCorp Packer
+      uses: hashicorp/setup-packer@v2
+      with:
+        packer_version: latest
+
+    - name: Install packages
+      run: |
+        sudo apt update
+        sudo apt install -y qemu-utils cloud-image-utils
+
+    - name: Create Build Directory
+      run: mkdir -p build
+
+    - name: Create Packer Template
+      run: |
+        cat <<EOF > build/ubuntu-kde.pkr.hcl
+        variable "output_directory" {
+          default = "output-vmdk"
+        }
+
+        source "qemu" "ubuntu" {
+          iso_url        = "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso"
+          iso_checksum   = "none"
+          disk_size      = "20000" # 20GB
+          memory         = 2048
+          cpus           = 2
+          ssh_username   = "ubuntu"
+          ssh_password   = "changeMe"
+          shutdown_command = "echo changeMe | sudo -S shutdown -P now"
+        }
+
+        build {
+          name    = "ubuntu-kde-vmware"
+          sources = ["source.qemu.ubuntu"]
+
+          provisioner "shell" {
+            inline = [
+              "sudo apt update",
+              "sudo apt install -y kde-plasma-desktop",
+              "sudo systemctl set-default graphical.target",
+              "echo ubuntu:changeMe | sudo chpasswd",
+              "sudo chage -d 0 ubuntu" # Force password change after first login
+            ]
+          }
+
+          post-processor "vmware-vdiskmanager" {
+            output = var.output_directory
+          }
+        }
+        EOF
+
+    - name: Build VMDK Image
+      run: |
+        packer init build/ubuntu-kde.pkr.hcl
+        packer build build/ubuntu-kde.pkr.hcl
+
+    - name: Upload VMDK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ubuntu-kde-vmdk
+        path: build/output-vmdk/*.vmdk
