@@ -1,4 +1,4 @@
-name: Build Ubuntu KDE VMDK Image
+name: Build Ubuntu KDE VM Image
 
 on:
   schedule:
@@ -29,20 +29,18 @@ jobs:
     - name: Create Packer Template
       run: |
         cat <<EOF > build/ubuntu-kde.pkr.hcl
-        variable "output_directory" {
-          default = "output-vmdk"
-        }
 
         source "qemu" "ubuntu" {
-          iso_url        = "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso"
-          iso_checksum   = "none"
-          disk_size      = "20000" # 20GB
-          memory         = 2048
-          cpus           = 2
-          accelerator    = "kvm"
-          format         = "vmdk"
-          ssh_username   = "ubuntu"
-          ssh_password   = "changeMe"
+          iso_url          = "https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso"
+          iso_checksum     = "none"
+          disk_size        = "20000" # 20GB
+          memory           = 2048
+          cpus             = 2
+          accelerator      = "kvm"
+          format           = "qcow2"
+          output_directory = "output"
+          ssh_username     = "ubuntu"
+          ssh_password     = "changeMe"
           shutdown_command = "echo changeMe | sudo -S shutdown -P now"
         }
 
@@ -65,7 +63,7 @@ jobs:
     - name: Build VMDK Image
       run: |
         packer plugins install github.com/hashicorp/qemu
-        packer plugins install github.com/hashicorp/vmware
+        # packer plugins install github.com/hashicorp/vmware
         packer init build/ubuntu-kde.pkr.hcl
         packer build build/ubuntu-kde.pkr.hcl
 
@@ -73,4 +71,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: ubuntu-kde-vmdk
-        path: build/output-vmdk/*.vmdk
+        path: build/output/*
