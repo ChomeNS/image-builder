@@ -22,8 +22,6 @@ jobs:
         sudo apt update
         sudo apt purge -y man-db
         sudo apt install -y qemu-system qemu-system-x86 qemu-system-gui qemu-utils cloud-image-utils
-        sudo adduser $(whoami) kvm
-
     - name: Free Disk Space
       uses: jlumbroso/free-disk-space@v1.3.1
 
@@ -71,6 +69,7 @@ jobs:
         packer plugins install github.com/hashicorp/qemu
         # packer plugins install github.com/hashicorp/vmware
         packer init build/ubuntu-kde.pkr.hcl
+        sudo chmod 666 /dev/kvm # very hacky approach but works
         PACKER_LOG=1 packer build build/ubuntu-kde.pkr.hcl
 
     - name: Upload VMDK Artifact
