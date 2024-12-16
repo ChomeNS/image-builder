@@ -47,16 +47,16 @@ jobs:
           ssh_password     = "changeMe"
           shutdown_command = "echo changeMe | sudo -S shutdown -P now"
           boot_command     = [
-              "<esc><esc><enter><wait>",
-              "/install/vmlinuz noapic",
-              " initrd=/install/initrd.gz",
-              " auto=true",
-              " priority=critical",
-              " hostname={{user `hostname`}}",
-              " passwd/user-fullname=Ubuntu",
-              " passwd/username=ubuntu",
-              " passwd/user-password=changeMe",
-              " passwd/user-password-again=changeMe",
+              "<esc><esc><enter><wait>"
+              "/install/vmlinuz noapic"
+              " initrd=/install/initrd.gz"
+              " auto=true"
+              " priority=critical"
+              " hostname=ubuntu"
+              " passwd/user-fullname=Ubuntu"
+              " passwd/username=ubuntu"
+              " passwd/user-password=changeMe"
+              " passwd/user-password-again=changeMe"
               " -- <enter>"
           ],
         }
