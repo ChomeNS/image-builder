@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt purge -y man-db
-        sudo apt install -y qemu-system qemu-system-x86 qemu-utils cloud-image-utils
+        sudo apt install -y qemu-system qemu-system-x86 qemu-system-gui qemu-utils cloud-image-utils
         sudo adduser $(whoami) kvm
 
     - name: Free Disk Space
@@ -42,6 +42,7 @@ jobs:
           cpus             = 2
           accelerator      = "kvm"
           display          = "none"
+          headless         = false
           format           = "qcow2"
           output_directory = "output"
           ssh_username     = "ubuntu"
