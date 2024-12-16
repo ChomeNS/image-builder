@@ -41,6 +41,7 @@ jobs:
           memory           = 2048
           cpus             = 2
           accelerator      = "kvm"
+          display          = "none"
           format           = "qcow2"
           output_directory = "output"
           ssh_username     = "ubuntu"
